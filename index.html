@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 350px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 20px;
+            color: #007BFF;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #007BFF;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #0056b3;
+            outline: none;
+        }
+
+        input[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .weather-info {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .icon {
+            width: 50px;
+            height: 50px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weather App</h1>
+        <form id="weatherForm">
+            <input type="text" id="city" placeholder="Enter city name" required>
+            <input type="submit" value="Get Weather">
+        </form>
+
+        <div class="weather-info" id="weatherInfo"></div>
+
+        <div class="footer">&copy; 2024 Weather App</div>
+    </div>
+
+    <script>
+        const apiKey = "639002ce3961af0ce4651bf066b7d764";  // Your OpenWeatherMap API key
+
+        document.getElementById("weatherForm").addEventListener("submit", function(event) {
+            event.preventDefault();  // Prevent form submission (page reload)
+            
+            const city = document.getElementById("city").value.trim();
+            if (city) {
+                getWeather(city);
+            } else {
+                alert("Please enter a city name.");
+            }
+        });
+
+        function getWeather(city) {
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('City not found');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayWeather(data);
+                })
+                .catch(error => {
+                    document.getElementById("weatherInfo").innerHTML = `<p style="color: red;">${error.message}</p>`;
+                });
+        }
+
+        function displayWeather(data) {
+            const weatherInfo = document.getElementById("weatherInfo");
+            const cityName = data.name;
+            const temperature = data.main.temp;
+            const feelsLike = data.main.feels_like;
+            const humidity = data.main.humidity;
+            const description = data.weather[0].description;
+            const icon = data.weather[0].icon;
+
+            weatherInfo.innerHTML = `
+                <h2>Weather in ${cityName}</h2>
+                <p>Temperature: ${temperature}°C</p>
+                <p>Feels Like: ${feelsLike}°C</p>
+                <p>Humidity: ${humidity}%</p>
+                <p>Description: ${description}</p>
+                <img class="icon" src="http://openweathermap.org/img/w/${icon}.png" alt="${description}" />
+            `;
+        }
+    </script>
+</body>
+</html>
